@@ -34,6 +34,12 @@
         <artifactId>mssql-jdbc</artifactId>
         <version>12.4.2.jre11</version>
     </dependency>
+    <!-- Hibernate Core cho JPA 3.0 -->
+    <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>6.6.1.Final</version>
+    </dependency>
   </dependencies>
 
   <build>
