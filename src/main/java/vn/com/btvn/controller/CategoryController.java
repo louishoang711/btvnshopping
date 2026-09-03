@@ -59,31 +59,41 @@ public class CategoryController extends HttpServlet {
 
         if (url.contains("/admin/category/insert")) {
             String categoryname = req.getParameter("categoryname");
-            int status = Integer.parseInt(req.getParameter("status"));
+            String statusStr = req.getParameter("status");
             String images = req.getParameter("images");
 
+            // Server-side validation
+            if (categoryname == null || categoryname.trim().length() < 3) {
+                req.setAttribute("error", "Tên danh mục không được để trống và phải có ít nhất 3 ký tự!");
+                req.setAttribute("categoryname", categoryname);
+                req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+                return;
+            }
+
+            int status = 1;
+            try {
+                if (statusStr != null) status = Integer.parseInt(statusStr);
+            } catch (NumberFormatException ignored) {}
+
             Category category = new Category();
-            category.setCategoryname(categoryname);
+            category.setCategoryname(categoryname.trim());
             category.setStatus(status);
 
             String uploadPath = Constant.DIR;
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
+            if (!uploadDir.exists()) uploadDir.mkdirs();
 
             try {
                 Part part = req.getPart("images1");
                 if (part != null && part.getSize() > 0) {
                     String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
                     int index = filename.lastIndexOf(".");
-                    String ext = filename.substring(index + 1);
+                    String ext = (index != -1) ? filename.substring(index + 1) : "jpg";
                     String fname = System.currentTimeMillis() + "." + ext;
-
                     part.write(uploadPath + File.separator + fname);
                     category.setImages(fname);
-                } else if (images != null && !images.isEmpty()) {
-                    category.setImages(images);
+                } else if (images != null && !images.trim().isEmpty()) {
+                    category.setImages(images.trim());
                 } else {
                     category.setImages("avatar.png");
                 }
@@ -93,24 +103,37 @@ public class CategoryController extends HttpServlet {
 
             cateService.insert(category);
             resp.sendRedirect(req.getContextPath() + "/admin/categories");
+            return;
         }
 
         if (url.contains("/admin/category/update")) {
             int categoryid = Integer.parseInt(req.getParameter("categoryid"));
             String categoryname = req.getParameter("categoryname");
-            int status = Integer.parseInt(req.getParameter("status"));
+            String statusStr = req.getParameter("status");
             String images = req.getParameter("images");
 
             Category category = cateService.findById(categoryid);
+
+            // Server-side validation
+            if (categoryname == null || categoryname.trim().length() < 3) {
+                req.setAttribute("error", "Tên danh mục không được để trống và phải có ít nhất 3 ký tự!");
+                req.setAttribute("cate", category);
+                req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+                return;
+            }
+
+            int status = category.getStatus();
+            try {
+                if (statusStr != null) status = Integer.parseInt(statusStr);
+            } catch (NumberFormatException ignored) {}
+
             String fileold = category.getImages();
-            category.setCategoryname(categoryname);
+            category.setCategoryname(categoryname.trim());
             category.setStatus(status);
 
             String uploadPath = Constant.DIR;
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
+            if (!uploadDir.exists()) uploadDir.mkdirs();
 
             try {
                 Part part = req.getPart("images1");
@@ -120,12 +143,10 @@ public class CategoryController extends HttpServlet {
                             deleteFile(uploadPath + File.separator + fileold);
                         } catch (Exception ignored) {}
                     }
-
                     String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
                     int index = filename.lastIndexOf(".");
                     String ext = filename.substring(index + 1);
                     String fname = System.currentTimeMillis() + "." + ext;
-
                     part.write(uploadPath + File.separator + fname);
                     category.setImages(fname);
                 } else if (images != null && !images.isEmpty()) {

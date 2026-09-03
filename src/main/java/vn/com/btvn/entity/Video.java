@@ -4,32 +4,31 @@ import java.io.Serializable;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="videos")
-@NamedQuery(name="Video.findAll", query="SELECT v FROM Video v")
+@Table(name = "videos")
 public class Video implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="videoId")
+    @Column(name = "VideoId")
     private String videoId;
 
-    @Column(name="active")
-    private boolean active;
+    @Column(name = "Active")
+    private int active;
 
-    @Column(name="description", columnDefinition ="NVARCHAR(MAX) NULL")
+    @Column(name = "Description", columnDefinition = "NVARCHAR(500)")
     private String description;
 
-    @Column(name="poster", columnDefinition ="NVARCHAR(255) NULL")
+    @Column(name = "Poster", columnDefinition = "NVARCHAR(500)")
     private String poster;
 
-    @Column(name="title", columnDefinition ="NVARCHAR(255) NULL")
+    @Column(name = "Title", columnDefinition = "NVARCHAR(255)")
     private String title;
 
-    @Column(name="views")
+    @Column(name = "Views")
     private int views;
 
     @ManyToOne
-    @JoinColumn(name="categoryId")
+    @JoinColumn(name = "CategoryId")
     private Category category;
 
     public Video() {}
@@ -37,8 +36,8 @@ public class Video implements Serializable {
     public String getVideoId() { return videoId; }
     public void setVideoId(String videoId) { this.videoId = videoId; }
 
-    public boolean getActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public int getActive() { return active; }
+    public void setActive(int active) { this.active = active; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

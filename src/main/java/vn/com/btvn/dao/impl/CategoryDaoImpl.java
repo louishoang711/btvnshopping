@@ -10,7 +10,6 @@ import vn.com.btvn.dao.ICategoryDao;
 import vn.com.btvn.entity.Category;
 
 public class CategoryDaoImpl implements ICategoryDao {
-
     @Override
     public void insert(Category category) {
         EntityManager enma = JpaConfig.getEntityManager();

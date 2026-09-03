@@ -10,19 +10,13 @@ public class CategoryServiceImpl implements ICategoryService {
     public ICategoryDao cateDao = new CategoryDaoImpl();
 
     @Override
-    public List<Category> findAll() {
-        return cateDao.findAll();
-    }
+    public List<Category> findAll() { return cateDao.findAll(); }
 
     @Override
-    public Category findById(int id) {
-        return cateDao.findById(id);
-    }
+    public Category findById(int id) { return cateDao.findById(id); }
 
     @Override
-    public List<Category> searchByName(String keyword) {
-        return cateDao.searchByName(keyword);
-    }
+    public List<Category> searchByName(String keyword) { return cateDao.searchByName(keyword); }
 
     @Override
     public void insert(Category category) {
@@ -50,14 +44,10 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public int count() {
-        return cateDao.count();
-    }
+    public int count() { return cateDao.count(); }
 
     @Override
-    public List<Category> findAll(int page, int pagesize) {
-        return cateDao.findAll(page, pagesize);
-    }
+    public List<Category> findAll(int page, int pagesize) { return cateDao.findAll(page, pagesize); }
 
     @Override
     public Category findByCategoryname(String name) {
