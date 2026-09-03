@@ -8,74 +8,77 @@
 </head>
 <body>
     <div class="card shadow-sm border-0">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 text-primary fw-bold">
-                <i class="bi bi-tags-fill me-2"></i>Quản Lý Danh Mục (JPA 3.0 &amp; Hibernate)
-            </h4>
-            <a href="${pageContext.request.contextPath}/admin/category/add" class="btn btn-success">
-                <i class="bi bi-plus-lg me-1"></i>Thêm Danh Mục Mới
+        <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="bi bi-folder2-open me-2 text-primary"></i>Danh Sách Danh Mục Sản Phẩm
+                </h5>
+                <small class="text-muted">Quản lý và cập nhật các danh mục bán hàng</small>
+            </div>
+            <a href="${pageContext.request.contextPath}/admin/category/add" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Thêm danh mục mới
             </a>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0">
-                    <thead class="table-dark">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th class="text-center" style="width: 80px;">ID</th>
-                            <th class="text-center" style="width: 140px;">Hình ảnh</th>
+                            <th class="text-center text-muted" style="width: 70px;">#</th>
+                            <th class="text-center" style="width: 120px;">Hình ảnh</th>
                             <th>Tên danh mục</th>
                             <th class="text-center" style="width: 140px;">Trạng thái</th>
-                            <th class="text-center" style="width: 160px;">Hành động</th>
+                            <th class="text-center" style="width: 160px;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:choose>
                             <c:when test="${empty listcate}">
                                 <tr>
-                                    <td colspan="5" class="text-center py-4 text-muted">
-                                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                        Chưa có danh mục nào. Hãy nhấn "Thêm Danh Mục Mới" để tạo!
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-box-seam fs-1 d-block text-secondary mb-2"></i>
+                                        Hiện chưa có danh mục nào trong hệ thống.
                                     </td>
                                 </tr>
                             </c:when>
                             <c:otherwise>
                                 <c:forEach items="${listcate}" var="cate">
                                     <tr>
-                                        <td class="text-center fw-bold">${cate.categoryId}</td>
+                                        <td class="text-center text-muted fw-semibold">${cate.categoryId}</td>
                                         <td class="text-center">
                                             <c:choose>
                                                 <c:when test="${cate.images.startsWith('http')}">
-                                                    <img src="${cate.images}" class="rounded border" style="width: 80px; height: 60px; object-fit: cover;" alt="${cate.categoryname}" />
+                                                    <img src="${cate.images}" class="rounded border" style="width: 65px; height: 50px; object-fit: cover;" alt="${cate.categoryname}" />
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <img src="${pageContext.request.contextPath}/image?fname=${cate.images}" class="rounded border" style="width: 80px; height: 60px; object-fit: cover;" alt="${cate.categoryname}" onerror="this.src='https://via.placeholder.com/80x60?text=No+Img'" />
+                                                    <img src="${pageContext.request.contextPath}/image?fname=${cate.images}" class="rounded border" style="width: 65px; height: 50px; object-fit: cover;" alt="${cate.categoryname}" onerror="this.src='https://via.placeholder.com/65x50?text=No+Img'" />
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td class="fw-semibold">${cate.categoryname}</td>
+                                        <td>
+                                            <span class="fw-semibold text-dark">${cate.categoryname}</span>
+                                        </td>
                                         <td class="text-center">
                                             <c:choose>
                                                 <c:when test="${cate.status == 1}">
-                                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
-                                                        <i class="bi bi-check-circle me-1"></i>Hoạt động
+                                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill">
+                                                        <i class="bi bi-dot"></i>Hoạt động
                                                     </span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
-                                                        <i class="bi bi-slash-circle me-1"></i>Khóa
+                                                    <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded-pill">
+                                                        <i class="bi bi-dot"></i>Tạm khóa
                                                     </span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="${pageContext.request.contextPath}/admin/category/edit?id=${cate.categoryId}" class="btn btn-outline-primary" title="Chỉnh sửa">
-                                                    <i class="bi bi-pencil"></i> Sửa
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/admin/category/delete?id=${cate.categoryId}" class="btn btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa danh mục [${cate.categoryname}]?')">
-                                                    <i class="bi bi-trash"></i> Xóa
-                                                </a>
-                                            </div>
+                                            <a href="${pageContext.request.contextPath}/admin/category/edit?id=${cate.categoryId}" class="btn btn-sm btn-outline-primary me-1" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil-square me-1"></i>Sửa
+                                            </a>
+                                            <a href="${pageContext.request.contextPath}/admin/category/delete?id=${cate.categoryId}" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục [${cate.categoryname}]?')">
+                                                <i class="bi bi-trash me-1"></i>Xóa
+                                            </a>
                                         </td>
                                     </tr>
                                 </c:forEach>

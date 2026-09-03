@@ -8,6 +8,7 @@ public class MySiteMeshFilter extends ConfigurableSiteMeshFilter {
     protected void applyCustomConfiguration(SiteMeshFilterBuilder builder) {
         builder.setDecoratorPrefix("")
                .addDecoratorPath("/*", "/views/decorators/web.jsp")
-               .addExcludedPath("/image*");
+               .addExcludedPath("/image*")
+               .addExcludedPath("/assets/*");
     }
 }
