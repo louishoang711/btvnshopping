@@ -6,6 +6,7 @@
     <persistence-unit name="jpa-hibernate-mysql">
         <class>vn.com.btvn.entity.Category</class>
         <class>vn.com.btvn.entity.Video</class>
+        <class>vn.com.btvn.entity.User</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://localhost:1433;databaseName=jakartaJPA;encrypt=true;trustServerCertificate=true"/>
