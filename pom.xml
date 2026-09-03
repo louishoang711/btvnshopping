@@ -1,57 +1,65 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>vn.com.btvn</groupId>
   <artifactId>btvnshopping</artifactId>
-  <version>1.0</version>
   <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>btvnshopping Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
   <dependencies>
-    <!-- Jakarta Servlet 6.0 -->
+    <!-- Jakarta EE API 10 -->
     <dependency>
-        <groupId>jakarta.servlet</groupId>
-        <artifactId>jakarta.servlet-api</artifactId>
-        <version>6.0.0</version>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-api</artifactId>
+        <version>10.0.0</version>
         <scope>provided</scope>
     </dependency>
+    
+    <!-- Hibernate Core -->
+    <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>6.2.7.Final</version>
+    </dependency>
+    
+    <!-- SQL Server JDBC -->
+    <dependency>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>mssql-jdbc</artifactId>
+        <version>11.2.3.jre17</version>
+    </dependency>
 
-    <!-- JSTL Jakarta -->
+    <!-- Sitemesh 3.2.0 (Hỗ trợ chuẩn Jakarta EE / Tomcat 10) -->
+    <dependency>
+        <groupId>org.sitemesh</groupId>
+        <artifactId>sitemesh</artifactId>
+        <version>3.2.0</version>
+    </dependency>
+
+    <!-- JSTL API 3.0 (Jakarta) -->
     <dependency>
         <groupId>jakarta.servlet.jsp.jstl</groupId>
         <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
         <version>3.0.0</version>
     </dependency>
+
+    <!-- JSTL Implementation (Glassfish) -->
     <dependency>
         <groupId>org.glassfish.web</groupId>
         <artifactId>jakarta.servlet.jsp.jstl</artifactId>
         <version>3.0.1</version>
     </dependency>
-
-    <!-- SQL Server Driver -->
-    <dependency>
-        <groupId>com.microsoft.sqlserver</groupId>
-        <artifactId>mssql-jdbc</artifactId>
-        <version>12.4.2.jre11</version>
-    </dependency>
-    <!-- Hibernate Core cho JPA 3.0 -->
-    <dependency>
-        <groupId>org.hibernate.orm</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>6.6.1.Final</version>
-    </dependency>
   </dependencies>
-
+  
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.4.0</version>
-        <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
-      </plugin>
-    </plugins>
+    <finalName>btvnshopping</finalName>
   </build>
 </project>
