@@ -15,10 +15,16 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-border: #e2e8f0;
+        }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
+            background-color: var(--bg-color);
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -27,52 +33,78 @@
             flex: 1;
         }
         .navbar-custom {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e9ecef;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            background: #ffffff;
+            border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
         }
         .navbar-brand {
             font-weight: 700;
-            color: #0d6efd !important;
+            color: var(--primary-color) !important;
             display: flex;
             align-items: center;
-            font-size: 1.15rem;
+            font-size: 1.2rem;
+            letter-spacing: -0.3px;
         }
         .school-logo {
             height: 42px;
             width: auto;
             object-fit: contain;
-            border-radius: 4px;
+            border-radius: 6px;
+            transition: transform 0.2s;
+        }
+        .school-logo:hover {
+            transform: scale(1.05);
         }
         .nav-link {
             font-weight: 500;
-            color: #495057 !important;
-            padding: 0.5rem 1rem !important;
-            border-radius: 6px;
-            transition: all 0.2s;
+            color: #64748b !important;
+            padding: 0.5rem 0.9rem !important;
+            border-radius: 8px;
+            transition: all 0.2s ease;
         }
-        .nav-link:hover {
-            color: #0d6efd !important;
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color) !important;
+            background-color: #eff6ff;
+        }
+        .btn-profile-pill {
             background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 500;
+            padding: 0.4rem 0.85rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+            text-decoration: none;
         }
-        .nav-link.btn-profile {
-            background-color: #e7f1ff;
-            color: #0d6efd !important;
-        }
-        .nav-link.btn-profile:hover {
-            background-color: #d0e2ff;
+        .btn-profile-pill:hover {
+            background-color: #e2e8f0;
+            color: var(--primary-color);
         }
         .card {
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+        .stat-card {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         footer {
             background-color: #ffffff;
-            border-top: 1px solid #e9ecef;
+            border-top: 1px solid var(--card-border);
             padding: 1.25rem 0;
-            color: #6c757d;
-            font-size: 0.9rem;
+            color: #64748b;
+            font-size: 0.875rem;
         }
     </style>
     <sitemesh:write property='head'/>
@@ -82,32 +114,33 @@
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
             <a class="navbar-brand" href="${pageContext.request.contextPath}/admin/categories">
-                <img src="${pageContext.request.contextPath}/assets/logo.jpg" alt="Logo Trường" class="school-logo me-2 shadow-sm" onerror="this.style.display='none'" />
+                <img src="${pageContext.request.contextPath}/assets/logo.jpg" alt="Logo Trường" class="school-logo me-2 border shadow-xs" onerror="this.style.display='none'" />
                 <span>BTVN Shopping</span>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav me-auto ms-lg-3">
+                <ul class="navbar-nav me-auto ms-lg-3 gap-1">
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/categories">
-                            <i class="bi bi-grid me-1"></i>Danh mục sản phẩm
+                        <a class="nav-link" id="nav-categories" href="${pageContext.request.contextPath}/admin/categories">
+                            <i class="bi bi-grid-fill me-1"></i>Danh mục sản phẩm
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/category/add">
-                            <i class="bi bi-plus-circle me-1"></i>Thêm danh mục
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link btn-profile" href="${pageContext.request.contextPath}/profile">
-                            <i class="bi bi-person-circle me-1"></i>Hồ sơ cá nhân
+                        <a class="nav-link" id="nav-category-add" href="${pageContext.request.contextPath}/admin/category/add">
+                            <i class="bi bi-plus-circle-fill me-1"></i>Thêm danh mục
                         </a>
                     </li>
                 </ul>
+                <div class="d-flex align-items-center">
+                    <a href="${pageContext.request.contextPath}/profile" class="btn-profile-pill d-flex align-items-center gap-2" title="Xem thông tin cá nhân">
+                        <span class="badge bg-primary rounded-circle p-1">
+                            <i class="bi bi-person-fill text-white"></i>
+                        </span>
+                        <span>Tài khoản Admin</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -122,11 +155,20 @@
     <!-- Footer -->
     <footer class="text-center">
         <div class="container">
-            <p class="mb-0">&copy; 2026 BTVN Shopping - Hệ thống Quản lý Bán hàng</p>
+            <p class="mb-0">&copy; 2026 BTVN Shopping - Hệ thống Quản trị Bán hàng trực quan</p>
         </div>
     </footer>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tự động highlight menu item theo URL
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/admin/category/add')) {
+            document.getElementById('nav-category-add')?.classList.add('active');
+        } else if (currentPath.includes('/admin/categor')) {
+            document.getElementById('nav-categories')?.classList.add('active');
+        }
+    </script>
 </body>
 </html>
