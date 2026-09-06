@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><sitemesh:write property='title'/> - BTVN Shopping</title>
+    <title><sitemesh:write property='title'/> - HCMUTE Shop</title>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,7 +115,7 @@
         <div class="container">
             <a class="navbar-brand" href="${pageContext.request.contextPath}/admin/categories">
                 <img src="${pageContext.request.contextPath}/assets/logo.jpg" alt="Logo Trường" class="school-logo me-2 border shadow-xs" onerror="this.style.display='none'" />
-                <span>BTVN Shopping</span>
+                <span>HCMUTE Shop</span>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
@@ -155,7 +155,7 @@
     <!-- Footer -->
     <footer class="text-center">
         <div class="container">
-            <p class="mb-0">&copy; 2026 BTVN Shopping - Hệ thống Quản trị Bán hàng trực quan</p>
+            <p class="mb-0">&copy; 2026 HCMUTE Shop - Hệ thống Quản trị Bán hàng trực quan</p>
         </div>
     </footer>
 

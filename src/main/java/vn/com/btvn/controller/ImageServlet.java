@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,10 +20,18 @@ public class ImageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String fileName = req.getParameter("fname");
-        if (fileName != null) {
-            File file = new File(Constant.DIR + File.separator + fileName);
-            if (file.exists()) {
-                resp.setContentType("image/jpeg");
+        if (fileName != null && !fileName.isBlank()) {
+            Path uploadRoot = Path.of(Constant.DIR).toAbsolutePath().normalize();
+            Path requested = uploadRoot.resolve(new File(fileName).getName()).normalize();
+            if (!requested.startsWith(uploadRoot)) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            File file = requested.toFile();
+            if (file.isFile()) {
+                String contentType = Files.probeContentType(requested);
+                resp.setContentType(contentType == null ? "application/octet-stream" : contentType);
+                resp.setHeader("Cache-Control", "public, max-age=86400");
                 try (FileInputStream fis = new FileInputStream(file);
                      OutputStream os = resp.getOutputStream()) {
                     byte[] buffer = new byte[1024];
@@ -30,7 +40,11 @@ public class ImageServlet extends HttpServlet {
                         os.write(buffer, 0, len);
                     }
                 }
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 }

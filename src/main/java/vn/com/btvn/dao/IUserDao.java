@@ -9,5 +9,6 @@ public interface IUserDao {
     void delete(int id) throws Exception;
     User findById(int id);
     User findByUsername(String username);
+    User findByEmail(String email);
     List<User> findAll();
 }

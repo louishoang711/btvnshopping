@@ -35,12 +35,8 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public void delete(int id) {
-        try {
-            cateDao.delete(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void delete(int id) throws Exception {
+        cateDao.delete(id);
     }
 
     @Override

@@ -5,8 +5,19 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 public class JpaConfig {
+    private static final EntityManagerFactory FACTORY =
+            Persistence.createEntityManagerFactory("jpa-hibernate-mysql");
+
+    private JpaConfig() {
+    }
+
     public static EntityManager getEntityManager() {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("jpa-hibernate-mysql");
-        return factory.createEntityManager();
+        return FACTORY.createEntityManager();
+    }
+
+    public static void close() {
+        if (FACTORY.isOpen()) {
+            FACTORY.close();
+        }
     }
 }

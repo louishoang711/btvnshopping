@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,8 +19,9 @@ import vn.com.btvn.entity.Category;
 import vn.com.btvn.service.ICategoryService;
 import vn.com.btvn.service.impl.CategoryServiceImpl;
 import vn.com.btvn.util.Constant;
+import vn.com.btvn.util.FileUploadUtil;
 
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10L * 1024 * 1024, maxRequestSize = 12L * 1024 * 1024)
 @WebServlet(urlPatterns = { "/admin/categories", "/admin/category/add", "/admin/category/insert",
         "/admin/category/edit", "/admin/category/update", "/admin/category/delete" })
 public class CategoryController extends HttpServlet {
@@ -36,16 +38,20 @@ public class CategoryController extends HttpServlet {
         } else if (url.contains("/admin/category/add")) {
             req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
         } else if (url.contains("/admin/category/edit")) {
-            int id = Integer.parseInt(req.getParameter("id"));
+            int id;
+            try { id = Integer.parseInt(req.getParameter("id")); }
+            catch (Exception exception) { resp.sendError(HttpServletResponse.SC_BAD_REQUEST); return; }
             Category category = cateService.findById(id);
+            if (category == null) { resp.sendError(HttpServletResponse.SC_NOT_FOUND); return; }
             req.setAttribute("cate", category);
             req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
         } else if (url.contains("/admin/category/delete")) {
             int id = Integer.parseInt(req.getParameter("id"));
             try {
                 cateService.delete(id);
+                req.getSession().setAttribute("adminMessage", "Đã xóa danh mục.");
             } catch (Exception e) {
-                e.printStackTrace();
+                req.getSession().setAttribute("adminError", "Không thể xóa danh mục đang có sản phẩm.");
             }
             resp.sendRedirect(req.getContextPath() + "/admin/categories");
         }
@@ -69,6 +75,18 @@ public class CategoryController extends HttpServlet {
                 req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
                 return;
             }
+            if (categoryname.trim().length() > 200) {
+                req.setAttribute("error", "Tên danh mục không được vượt quá 200 ký tự.");
+                req.setAttribute("categoryname", categoryname);
+                req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+                return;
+            }
+            if (cateService.findByCategoryname(categoryname.trim()) != null) {
+                req.setAttribute("error", "Tên danh mục đã tồn tại.");
+                req.setAttribute("categoryname", categoryname);
+                req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+                return;
+            }
 
             int status = 1;
             try {
@@ -84,24 +102,23 @@ public class CategoryController extends HttpServlet {
             if (!uploadDir.exists()) uploadDir.mkdirs();
 
             try {
-                Part part = req.getPart("images1");
-                if (part != null && part.getSize() > 0) {
-                    String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-                    int index = filename.lastIndexOf(".");
-                    String ext = (index != -1) ? filename.substring(index + 1) : "jpg";
-                    String fname = System.currentTimeMillis() + "." + ext;
-                    part.write(uploadPath + File.separator + fname);
-                    category.setImages(fname);
+                String uploaded = FileUploadUtil.saveImage(req.getPart("images1"), "category");
+                if (uploaded != null) {
+                    category.setImages(uploaded);
                 } else if (images != null && !images.trim().isEmpty()) {
                     category.setImages(images.trim());
                 } else {
-                    category.setImages("avatar.png");
+                    category.setImages(null);
                 }
-            } catch (FileNotFoundException fne) {
-                fne.printStackTrace();
+            } catch (IllegalArgumentException exception) {
+                req.setAttribute("error", exception.getMessage());
+                req.setAttribute("categoryname", categoryname);
+                req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+                return;
             }
 
             cateService.insert(category);
+            req.getSession().setAttribute("adminMessage", "Đã thêm danh mục mới.");
             resp.sendRedirect(req.getContextPath() + "/admin/categories");
             return;
         }
@@ -113,10 +130,18 @@ public class CategoryController extends HttpServlet {
             String images = req.getParameter("images");
 
             Category category = cateService.findById(categoryid);
+            if (category == null) { resp.sendError(HttpServletResponse.SC_NOT_FOUND); return; }
 
             // Server-side validation
-            if (categoryname == null || categoryname.trim().length() < 3) {
+            if (categoryname == null || categoryname.trim().length() < 3 || categoryname.trim().length() > 200) {
                 req.setAttribute("error", "Tên danh mục không được để trống và phải có ít nhất 3 ký tự!");
+                req.setAttribute("cate", category);
+                req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+                return;
+            }
+            Category sameName = cateService.findByCategoryname(categoryname.trim());
+            if (sameName != null && sameName.getCategoryId() != categoryid) {
+                req.setAttribute("error", "Tên danh mục đã tồn tại.");
                 req.setAttribute("cate", category);
                 req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
                 return;
@@ -136,29 +161,24 @@ public class CategoryController extends HttpServlet {
             if (!uploadDir.exists()) uploadDir.mkdirs();
 
             try {
-                Part part = req.getPart("images1");
-                if (part != null && part.getSize() > 0) {
-                    if (fileold != null && !fileold.startsWith("https")) {
-                        try {
-                            deleteFile(uploadPath + File.separator + fileold);
-                        } catch (Exception ignored) {}
-                    }
-                    String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-                    int index = filename.lastIndexOf(".");
-                    String ext = filename.substring(index + 1);
-                    String fname = System.currentTimeMillis() + "." + ext;
-                    part.write(uploadPath + File.separator + fname);
-                    category.setImages(fname);
+                String uploaded = FileUploadUtil.saveImage(req.getPart("images1"), "category");
+                if (uploaded != null) {
+                    category.setImages(uploaded);
                 } else if (images != null && !images.isEmpty()) {
                     category.setImages(images);
                 } else {
                     category.setImages(fileold);
                 }
-            } catch (FileNotFoundException fne) {
-                fne.printStackTrace();
+            } catch (IllegalArgumentException exception) {
+                req.setAttribute("error", exception.getMessage());
+                req.setAttribute("cate", category);
+                req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+                return;
             }
 
             cateService.update(category);
+            if (!Objects.equals(fileold, category.getImages())) FileUploadUtil.deleteLocalImage(fileold);
+            req.getSession().setAttribute("adminMessage", "Đã cập nhật danh mục.");
             resp.sendRedirect(req.getContextPath() + "/admin/categories");
         }
     }

@@ -1,6 +1,7 @@
 package vn.com.btvn.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
 @Entity
@@ -26,7 +27,7 @@ public class User implements Serializable {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "email", length = 100)
+    @Column(name = "email", length = 100, unique = true)
     private String email;
 
     @Column(name = "images", columnDefinition = "NVARCHAR(500)")
@@ -34,6 +35,17 @@ public class User implements Serializable {
 
     @Column(name = "role")
     private int role;
+
+    @Column(name = "active")
+    private Integer active = 1;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+    }
 
     public User() {
     }
@@ -46,6 +58,7 @@ public class User implements Serializable {
         this.email = email;
         this.images = images;
         this.role = role;
+        this.active = 1;
     }
 
     public int getId() {
@@ -111,4 +124,10 @@ public class User implements Serializable {
     public void setRole(int role) {
         this.role = role;
     }
+
+    public int getActive() { return active == null ? 0 : active; }
+    public void setActive(int active) { this.active = active; }
+    public boolean hasActivationState() { return active != null; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

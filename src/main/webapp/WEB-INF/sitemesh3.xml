@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <decorator-prefix></decorator-prefix>
+
+    <mapping path="/admin/*" decorator="/views/decorators/admin.jsp"/>
+    <mapping path="/profile*" decorator="/views/decorators/admin.jsp"/>
+    <mapping path="/*" decorator="/views/decorators/web.jsp"/>
+
+    <mapping path="/login*" exclude="true"/>
+    <mapping path="/logout*" exclude="true"/>
+    <mapping path="/register*" exclude="true"/>
+    <mapping path="/verify-otp*" exclude="true"/>
+    <mapping path="/resend-otp*" exclude="true"/>
+    <mapping path="/forgot-password*" exclude="true"/>
+    <mapping path="/reset-password*" exclude="true"/>
+    <mapping path="/image*" exclude="true"/>
+    <mapping path="/assets/*" exclude="true"/>
+</sitemesh>

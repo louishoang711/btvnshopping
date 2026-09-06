@@ -18,6 +18,7 @@ import vn.com.btvn.entity.User;
 import vn.com.btvn.service.IUserService;
 import vn.com.btvn.service.impl.UserServiceImpl;
 import vn.com.btvn.util.Constant;
+import vn.com.btvn.util.AuthSession;
 
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
@@ -31,11 +32,12 @@ public class ProfileController extends HttpServlet {
     private IUserService userService = new UserServiceImpl();
 
     // Regex kiểm tra số điện thoại Việt Nam (10 chữ số, bắt đầu bằng 0)
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)[3|5|7|8|9][0-9]{8}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)[35789][0-9]{8}$");
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        User user = userService.getOrCreateDefaultUser();
+        User account = (User) req.getSession().getAttribute(AuthSession.ACCOUNT);
+        User user = userService.findById(account.getId());
         req.setAttribute("user", user);
         req.getRequestDispatcher("/views/profile.jsp").forward(req, resp);
     }
@@ -45,20 +47,12 @@ public class ProfileController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
-        String idStr = req.getParameter("id");
         String fullname = req.getParameter("fullname");
         String phone = req.getParameter("phone");
         String imageUrl = req.getParameter("images");
 
-        User user = null;
-        if (idStr != null && !idStr.isEmpty()) {
-            try {
-                user = userService.findById(Integer.parseInt(idStr));
-            } catch (Exception ignored) {}
-        }
-        if (user == null) {
-            user = userService.getOrCreateDefaultUser();
-        }
+        User account = (User) req.getSession().getAttribute(AuthSession.ACCOUNT);
+        User user = userService.findById(account.getId());
 
         // 1. Server-side Validation: Kiểm tra fullname
         if (fullname == null || fullname.trim().length() < 2) {
@@ -126,6 +120,7 @@ public class ProfileController extends HttpServlet {
         // 5. Lưu vào Database qua JPA
         try {
             userService.update(user);
+            req.getSession().setAttribute(AuthSession.ACCOUNT, user);
             req.setAttribute("message", "Cập nhật thông tin cá nhân thành công!");
         } catch (Exception e) {
             req.setAttribute("error", "Lỗi khi cập nhật cơ sở dữ liệu: " + e.getMessage());

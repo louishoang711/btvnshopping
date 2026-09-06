@@ -4,165 +4,91 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Chỉnh Sửa Danh Mục</title>
+    <title>Chỉnh sửa danh mục</title>
 </head>
 <body>
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/categories" class="text-decoration-none">Danh mục</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa #${cate.categoryId}</li>
-        </ol>
-    </nav>
-
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
-                    <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark">
-                            <i class="bi bi-pencil-square me-2 text-primary"></i>Chỉnh Sửa Danh Mục: <span class="text-primary">${cate.categoryname}</span>
-                        </h5>
-                        <small class="text-muted">Cập nhật thông tin và quản lý hình ảnh danh mục</small>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    <c:if test="${not empty error}">
-                        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
-                            <i class="bi bi-exclamation-circle me-2"></i>${error}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    </c:if>
-
-                    <form action="${pageContext.request.contextPath}/admin/category/update" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        <input type="hidden" name="categoryid" value="${cate.categoryId}" />
-
-                        <!-- Tên danh mục -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label for="categoryname" class="form-label fw-semibold mb-0">Tên danh mục <span class="text-danger">*</span></label>
-                                <span class="text-muted small" id="charCount">${cate.categoryname.length()}/200 ký tự</span>
-                            </div>
-                            <input type="text" class="form-control" id="categoryname" name="categoryname" 
-                                   value="${cate.categoryname}" required minlength="3" maxlength="200" 
-                                   oninput="updateCharCount(this);" />
-                            <div class="invalid-feedback">
-                                Vui lòng nhập tên danh mục hợp lệ (từ 3 đến 200 ký tự).
-                            </div>
-                        </div>
-
-                        <!-- Khu vực hình ảnh trực quan -->
-                        <div class="mb-4 p-3 bg-light rounded-3 border">
-                            <label class="form-label fw-semibold d-block">Hình ảnh danh mục</label>
-                            
-                            <div class="row align-items-center g-3">
-                                <!-- Hộp xem trước trực quan -->
-                                <div class="col-sm-4 text-center">
-                                    <div class="position-relative border rounded-3 bg-white p-2 d-inline-block shadow-2xs">
-                                        <c:choose>
-                                            <c:when test="${cate.images.startsWith('http')}">
-                                                <img id="categoryImgPreview" src="${cate.images}" 
-                                                     class="rounded img-fluid" style="width: 140px; height: 100px; object-fit: cover;" alt="Xem trước" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <img id="categoryImgPreview" src="${pageContext.request.contextPath}/image?fname=${cate.images}" 
-                                                     class="rounded img-fluid" style="width: 140px; height: 100px; object-fit: cover;" alt="Xem trước"
-                                                     onerror="this.src='https://via.placeholder.com/140x100?text=No+Img'" />
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                    <div class="small text-muted mt-1">Ảnh hiện tại / Mới</div>
-                                </div>
-
-                                <!-- Các lựa chọn thay đổi ảnh -->
-                                <div class="col-sm-8">
-                                    <div class="mb-2">
-                                        <label for="images1" class="form-label small fw-semibold text-muted mb-1">TẢI ẢNH MỚI THAY THẾ</label>
-                                        <input class="form-control" type="file" id="images1" name="images1" accept="image/*" onchange="previewUploadFile(this);" />
-                                        <div class="form-text small">Để trống nếu không muốn đổi ảnh.</div>
-                                    </div>
-                                    <div>
-                                        <label for="images" class="form-label small fw-semibold text-muted mb-1">HOẶC DÁN ĐƯỜNG DẪN ẢNH MỚI</label>
-                                        <input type="url" class="form-control" id="images" name="images" 
-                                               value="${cate.images.startsWith('http') ? cate.images : ''}" 
-                                               placeholder="https://..." oninput="previewUrlImage(this.value);" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Trạng thái (Thẻ chọn trực quan) -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold d-block">Trạng thái danh mục</label>
-                            <div class="row g-2">
-                                <div class="col-sm-6">
-                                    <input type="radio" class="btn-check" name="status" id="statusActive" value="1" ${cate.status == 1 ? "checked" : ""}>
-                                    <label class="btn btn-outline-success w-100 py-2 d-flex align-items-center justify-content-center gap-2" for="statusActive">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                        <span>Đang hoạt động</span>
-                                    </label>
-                                </div>
-                                <div class="col-sm-6">
-                                    <input type="radio" class="btn-check" name="status" id="statusLocked" value="0" ${cate.status == 0 ? "checked" : ""}>
-                                    <label class="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2" for="statusLocked">
-                                        <i class="bi bi-lock-fill"></i>
-                                        <span>Tạm khóa</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Nút bấm -->
-                        <div class="d-flex justify-content-between pt-3 border-top">
-                            <a href="${pageContext.request.contextPath}/admin/categories" class="btn btn-light border px-3">
-                                <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
-                            </a>
-                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
-                                <i class="bi bi-check2-circle me-1"></i>Lưu thay đổi
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="page-stack">
+    <div class="page-heading">
+        <div>
+            <p class="page-kicker">Danh mục · CAT-${cate.categoryId}</p>
+            <h1 class="page-title">Chỉnh sửa danh mục</h1>
+            <p class="page-subtitle">Cập nhật tên, trạng thái và hình ảnh hiển thị.</p>
         </div>
     </div>
 
-    <!-- Script đếm ký tự & xem trước ảnh trực quan -->
-    <script>
-        function updateCharCount(input) {
-            document.getElementById('charCount').textContent = input.value.length + '/200 ký tự';
-        }
+    <c:if test="${not empty error}"><div class="alert alert-error"><c:out value="${error}"/></div></c:if>
 
-        function previewUploadFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('categoryImgPreview').src = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+    <form id="categoryForm" action="${pageContext.request.contextPath}/admin/category/update" method="post" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="categoryid" value="${cate.categoryId}">
+        <div class="form-layout">
+            <section class="panel">
+                <div class="panel-header">
+                    <div><h2 class="panel-title">Thông tin danh mục</h2><p class="panel-subtitle">Thay đổi sẽ có hiệu lực ngay sau khi lưu.</p></div>
+                    <span class="status ${cate.status == 1 ? 'status-active' : 'status-paused'}">${cate.status == 1 ? 'Đang hoạt động' : 'Tạm khóa'}</span>
+                </div>
+                <div class="form-section">
+                    <div class="form-grid">
+                        <div class="field full">
+                            <label for="categoryname">Tên danh mục * <span class="field-hint" id="charCount">0/200 ký tự</span></label>
+                            <input class="form-control" id="categoryname" name="categoryname" type="text" value="<c:out value='${cate.categoryname}'/>" minlength="3" maxlength="200" required autocomplete="off">
+                        </div>
+                        <div class="field full">
+                            <label>Trạng thái *</label>
+                            <div class="choice-grid">
+                                <div><input class="choice-input" type="radio" name="status" id="statusActive" value="1" ${cate.status == 1 ? 'checked' : ''}><label class="choice-card" for="statusActive"><span class="choice-radio"></span><span><span class="choice-title">Đang hoạt động</span><span class="choice-help">Hiển thị danh mục trong hệ thống</span></span></label></div>
+                                <div><input class="choice-input" type="radio" name="status" id="statusPaused" value="0" ${cate.status == 0 ? 'checked' : ''}><label class="choice-card" for="statusPaused"><span class="choice-radio"></span><span><span class="choice-title">Tạm khóa</span><span class="choice-help">Ẩn danh mục để chỉnh sửa sau</span></span></label></div>
+                            </div>
+                        </div>
+                        <div class="field full">
+                            <label for="images1">Thay ảnh từ máy <span class="field-hint">Để trống nếu muốn giữ ảnh cũ</span></label>
+                            <input class="form-control" id="images1" name="images1" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+                        </div>
+                        <div class="field full">
+                            <label for="images">Hoặc thay bằng liên kết ảnh</label>
+                            <input class="form-control" id="images" name="images" type="url" value="${not empty cate.images && cate.images.startsWith('http') ? cate.images : ''}" placeholder="https://example.com/image.jpg">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <a class="btn" href="${pageContext.request.contextPath}/admin/categories">← Quay lại</a>
+                    <button class="btn btn-primary" type="submit">Lưu thay đổi →</button>
+                </div>
+            </section>
 
-        function previewUrlImage(url) {
-            if (url && url.trim().startsWith('http')) {
-                document.getElementById('categoryImgPreview').src = url.trim();
-            }
-        }
+            <aside class="panel preview-card">
+                <h2 class="panel-title">Ảnh danh mục</h2><p class="panel-subtitle" style="margin-bottom:14px">Ảnh hiện tại hoặc ảnh mới được chọn.</p>
+                <div class="preview-frame">
+                    <div class="preview-empty" id="previewEmpty" hidden>Không thể tải ảnh xem trước</div>
+                    <c:choose>
+                        <c:when test="${not empty cate.images && cate.images.startsWith('http')}"><img id="categoryImgPreview" src="${cate.images}" alt="Ảnh danh mục hiện tại"></c:when>
+                        <c:otherwise><img id="categoryImgPreview" src="${pageContext.request.contextPath}/image?fname=${cate.images}" alt="Ảnh danh mục hiện tại"></c:otherwise>
+                    </c:choose>
+                </div>
+                <p class="preview-note">Mã danh mục: <span class="mono">CAT-${cate.categoryId}</span><br>Khuyến nghị ảnh tỷ lệ 4:3, tối thiểu 800×600px.</p>
+            </aside>
+        </div>
+    </form>
+</div>
 
-        // Bootstrap form validation
-        (() => {
-            'use strict';
-            const forms = document.querySelectorAll('.needs-validation');
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-    </script>
+<script>
+(function () {
+    const form = document.getElementById('categoryForm');
+    const nameInput = document.getElementById('categoryname');
+    const count = document.getElementById('charCount');
+    const fileInput = document.getElementById('images1');
+    const urlInput = document.getElementById('images');
+    const preview = document.getElementById('categoryImgPreview');
+    const empty = document.getElementById('previewEmpty');
+
+    function updateCount() { count.textContent = nameInput.value.length + '/200 ký tự'; }
+    function showPreview(src) { preview.src = src; preview.hidden = false; empty.hidden = true; }
+    updateCount();
+    nameInput.addEventListener('input', updateCount);
+    fileInput.addEventListener('change', function () { if (fileInput.files && fileInput.files[0]) showPreview(URL.createObjectURL(fileInput.files[0])); });
+    urlInput.addEventListener('input', function () { if (/^https?:\/\//i.test(urlInput.value.trim())) showPreview(urlInput.value.trim()); });
+    preview.addEventListener('error', function () { preview.hidden = true; empty.hidden = false; });
+    form.addEventListener('submit', function (event) { if (!form.checkValidity()) { event.preventDefault(); nameInput.focus(); } });
+})();
+</script>
 </body>
 </html>

@@ -1,227 +1,159 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Danh Sách Danh Mục</title>
+    <title>Danh mục sản phẩm</title>
 </head>
 <body>
-    <!-- Breadcrumb điều hướng -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/categories" class="text-decoration-none">Hệ thống</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Danh mục sản phẩm</li>
-        </ol>
-    </nav>
+<c:set var="totalCount" value="${empty listcate ? 0 : listcate.size()}"/>
+<c:set var="activeCount" value="0"/>
+<c:set var="pausedCount" value="0"/>
+<c:forEach items="${listcate}" var="item">
+    <c:choose>
+        <c:when test="${item.status == 1}"><c:set var="activeCount" value="${activeCount + 1}"/></c:when>
+        <c:otherwise><c:set var="pausedCount" value="${pausedCount + 1}"/></c:otherwise>
+    </c:choose>
+</c:forEach>
 
-    <!-- Tính toán thống kê dữ liệu trực quan -->
-    <c:set var="totalCount" value="${empty listcate ? 0 : listcate.size()}" />
-    <c:set var="activeCount" value="0" />
-    <c:set var="lockedCount" value="0" />
-    <c:forEach items="${listcate}" var="cItem">
-        <c:if test="${cItem.status == 1}">
-            <c:set var="activeCount" value="${activeCount + 1}" />
-        </c:if>
-        <c:if test="${cItem.status == 0}">
-            <c:set var="lockedCount" value="${lockedCount + 1}" />
-        </c:if>
-    </c:forEach>
-
-    <!-- Thẻ thống kê trực quan (Stats Cards) -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="stat-card p-3 d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-muted small fw-semibold text-uppercase">TỔNG SỐ DANH MỤC</div>
-                    <div class="fs-2 fw-bold text-dark mt-1">${totalCount}</div>
-                </div>
-                <div class="rounded-circle bg-primary-subtle p-3 text-primary fs-3">
-                    <i class="bi bi-grid-fill"></i>
-                </div>
-            </div>
+<div class="page-stack">
+    <c:if test="${not empty sessionScope.adminMessage}"><div class="alert alert-success"><c:out value="${sessionScope.adminMessage}"/></div><c:remove var="adminMessage" scope="session"/></c:if>
+    <c:if test="${not empty sessionScope.adminError}"><div class="alert alert-error"><c:out value="${sessionScope.adminError}"/></div><c:remove var="adminError" scope="session"/></c:if>
+    <div class="page-heading">
+        <div>
+            <p class="page-kicker">Quản lý kho hàng</p>
+            <h1 class="page-title">Danh mục sản phẩm</h1>
+            <p class="page-subtitle">Theo dõi, cập nhật và sắp xếp các nhóm sản phẩm trong cửa hàng.</p>
         </div>
-        <div class="col-md-4">
-            <div class="stat-card p-3 d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-muted small fw-semibold text-uppercase">ĐANG HOẠT ĐỘNG</div>
-                    <div class="fs-2 fw-bold text-success mt-1">${activeCount}</div>
-                </div>
-                <div class="rounded-circle bg-success-subtle p-3 text-success fs-3">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stat-card p-3 d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-muted small fw-semibold text-uppercase">TẠM KHÓA</div>
-                    <div class="fs-2 fw-bold text-warning mt-1">${lockedCount}</div>
-                </div>
-                <div class="rounded-circle bg-warning-subtle p-3 text-warning fs-3">
-                    <i class="bi bi-lock-fill"></i>
-                </div>
-            </div>
-        </div>
+        <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/category/add">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Thêm danh mục
+        </a>
     </div>
 
-    <!-- Bảng danh sách & Công cụ tìm kiếm nhanh -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white py-3">
-            <div class="row g-2 align-items-center justify-content-between">
-                <div class="col-md-4">
-                    <!-- Ô tìm kiếm trực tiếp (Live Search) -->
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" id="liveSearchInput" class="form-control bg-light border-start-0 ps-0" 
-                               placeholder="Tìm nhanh tên danh mục..." onkeyup="filterCategoryTable();" />
-                    </div>
-                </div>
-                <div class="col-md-auto d-flex gap-2">
-                    <a href="${pageContext.request.contextPath}/admin/category/add" class="btn btn-primary px-3 shadow-xs">
-                        <i class="bi bi-plus-lg me-1"></i>Thêm danh mục mới
-                    </a>
+    <section class="metric-grid equal" aria-label="Thống kê danh mục">
+        <article class="metric-cell"><p class="metric-label">Tổng danh mục</p><p class="metric-value">${totalCount}</p></article>
+        <article class="metric-cell"><p class="metric-label">Đang hoạt động</p><p class="metric-value">${activeCount}</p><div class="metric-trend"><span class="trend-up">Sẵn sàng bán</span></div></article>
+        <article class="metric-cell"><p class="metric-label">Tạm khóa</p><p class="metric-value">${pausedCount}</p><div class="metric-trend"><span class="trend-down">Cần kiểm tra</span></div></article>
+        <article class="metric-cell"><p class="metric-label">Tỷ lệ hoạt động</p><p class="metric-value"><c:choose><c:when test="${totalCount > 0}"><fmt:formatNumber value="${activeCount * 100 / totalCount}" maxFractionDigits="0"/>%</c:when><c:otherwise>0%</c:otherwise></c:choose></p></article>
+    </section>
+
+    <section class="panel">
+        <div class="toolbar">
+            <div class="filter-tabs" role="group" aria-label="Lọc theo trạng thái">
+                <button class="filter-button active" type="button" data-filter="all">Tất cả <span class="mono">${totalCount}</span></button>
+                <button class="filter-button" type="button" data-filter="active">Hoạt động <span class="mono">${activeCount}</span></button>
+                <button class="filter-button" type="button" data-filter="paused">Tạm khóa <span class="mono">${pausedCount}</span></button>
+            </div>
+            <div class="toolbar-actions">
+                <div class="search-field">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="m11 11 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <input id="tableSearch" type="search" placeholder="Tìm tên danh mục..." autocomplete="off">
                 </div>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="categoryTable">
-                    <thead class="table-light text-secondary">
-                        <tr>
-                            <th class="text-center" style="width: 70px;">ID</th>
-                            <th class="text-center" style="width: 110px;">Hình ảnh</th>
-                            <th>Tên danh mục</th>
-                            <th class="text-center" style="width: 150px;">Trạng thái</th>
-                            <th class="text-center" style="width: 160px;">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="categoryTableBody">
-                        <c:choose>
-                            <c:when test="${empty listcate}">
-                                <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                                        Hiện chưa có danh mục nào. Hãy bấm <strong>Thêm danh mục mới</strong> để tạo!
+
+        <div class="table-scroll">
+            <table class="data-table" id="categoryTable">
+                <thead>
+                    <tr><th>ID</th><th>Danh mục</th><th>Hình ảnh</th><th>Trạng thái</th><th style="text-align:right">Thao tác</th></tr>
+                </thead>
+                <tbody>
+                    <c:choose>
+                        <c:when test="${empty listcate}">
+                            <tr id="emptyDatabase"><td colspan="5" class="empty-state">
+                                <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="19" rx="3" stroke="currentColor"/><path d="M5 13h22M12 18h8" stroke="currentColor" stroke-linecap="round"/></svg>
+                                Chưa có danh mục nào.<br><a style="color:var(--accent)" href="${pageContext.request.contextPath}/admin/category/add">Tạo danh mục đầu tiên →</a>
+                            </td></tr>
+                        </c:when>
+                        <c:otherwise>
+                            <c:forEach items="${listcate}" var="cate">
+                                <tr class="category-row" data-status="${cate.status == 1 ? 'active' : 'paused'}" data-name="<c:out value='${cate.categoryname}'/>">
+                                    <td class="table-id">#${cate.categoryId}</td>
+                                    <td>
+                                        <div class="name-cell">
+                                            <span class="thumb thumb-placeholder">C${cate.categoryId}</span>
+                                            <span><span class="table-primary category-name"><c:out value="${cate.categoryname}"/></span><span class="name-detail">Mã danh mục · CAT-${cate.categoryId}</span></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not empty cate.images && cate.images.startsWith('http')}"><img class="thumb thumb-lg previewable" src="${cate.images}" alt="Ảnh danh mục" loading="lazy"></c:when>
+                                            <c:otherwise><img class="thumb thumb-lg previewable" src="${pageContext.request.contextPath}/image?fname=${cate.images}" alt="Ảnh danh mục" loading="lazy" onerror="this.style.display='none'"></c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td><span class="status ${cate.status == 1 ? 'status-active' : 'status-paused'}">${cate.status == 1 ? 'Hoạt động' : 'Tạm khóa'}</span></td>
+                                    <td>
+                                        <div class="cell-actions">
+                                            <a class="btn btn-sm" href="${pageContext.request.contextPath}/admin/category/edit?id=${cate.categoryId}">Sửa</a>
+                                            <a class="btn btn-sm btn-danger" href="${pageContext.request.contextPath}/admin/category/delete?id=${cate.categoryId}" onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">Xóa</a>
+                                        </div>
                                     </td>
                                 </tr>
-                            </c:when>
-                            <c:otherwise>
-                                <c:forEach items="${listcate}" var="cate">
-                                    <tr class="category-row">
-                                        <td class="text-center text-muted fw-bold">#${cate.categoryId}</td>
-                                        <td class="text-center">
-                                            <c:choose>
-                                                <c:when test="${cate.images.startsWith('http')}">
-                                                    <img src="${cate.images}" class="rounded border shadow-2xs previewable-img" 
-                                                         style="width: 60px; height: 48px; object-fit: cover; cursor: pointer;" 
-                                                         alt="${cate.categoryname}" onclick="showImageModal(this.src, '${cate.categoryname}')" 
-                                                         title="Bấm để xem ảnh phóng to" />
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <img src="${pageContext.request.contextPath}/image?fname=${cate.images}" 
-                                                         class="rounded border shadow-2xs previewable-img" 
-                                                         style="width: 60px; height: 48px; object-fit: cover; cursor: pointer;" 
-                                                         alt="${cate.categoryname}" 
-                                                         onclick="showImageModal(this.src, '${cate.categoryname}')" 
-                                                         title="Bấm để xem ảnh phóng to"
-                                                         onerror="this.src='https://via.placeholder.com/60x48?text=No+Img'" />
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <span class="fw-semibold text-dark cat-name">${cate.categoryname}</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <c:choose>
-                                                <c:when test="${cate.status == 1}">
-                                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
-                                                        <i class="bi bi-check-circle me-1"></i>Đang hoạt động
-                                                    </span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill">
-                                                        <i class="bi bi-slash-circle me-1"></i>Tạm khóa
-                                                    </span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="${pageContext.request.contextPath}/admin/category/edit?id=${cate.categoryId}" 
-                                                   class="btn btn-outline-primary" title="Chỉnh sửa">
-                                                    <i class="bi bi-pencil-square me-1"></i>Sửa
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/admin/category/delete?id=${cate.categoryId}" 
-                                                   class="btn btn-outline-danger" title="Xóa" 
-                                                   onclick="return confirm('Bạn có chắc muốn xóa danh mục [${cate.categoryname}]?')">
-                                                    <i class="bi bi-trash me-1"></i>Xóa
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </c:otherwise>
-                        </c:choose>
-                    </tbody>
-                </table>
-            </div>
-            <!-- Thông báo khi không tìm thấy kết quả từ live search -->
-            <div id="noSearchMatch" class="text-center py-4 text-muted d-none">
-                <i class="bi bi-search fs-3 d-block mb-1"></i>
-                Không tìm thấy danh mục nào khớp với từ khóa tìm kiếm.
-            </div>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                    <tr id="noSearchResult" style="display:none"><td colspan="5" class="empty-state">Không tìm thấy danh mục phù hợp.</td></tr>
+                </tbody>
+            </table>
         </div>
+    </section>
+</div>
+
+<div class="modal-backdrop-custom" id="imageModal" role="dialog" aria-modal="true" aria-label="Xem ảnh danh mục">
+    <div class="image-modal">
+        <button class="icon-button modal-close" id="imageModalClose" type="button" aria-label="Đóng">×</button>
+        <img id="modalImage" src="" alt="Ảnh danh mục phóng lớn">
+        <div class="image-modal-caption" id="modalCaption">Ảnh danh mục</div>
     </div>
+</div>
 
-    <!-- Modal Xem ảnh phóng to trực quan -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header py-2">
-                    <h6 class="modal-title fw-bold" id="imageModalTitle">Xem hình ảnh</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center p-3">
-                    <img id="modalImgTag" src="" class="img-fluid rounded shadow-sm" style="max-height: 400px;" alt="Hình ảnh lớn" />
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+(function () {
+    const rows = Array.from(document.querySelectorAll('.category-row'));
+    const search = document.getElementById('tableSearch');
+    const noResult = document.getElementById('noSearchResult');
+    let statusFilter = 'all';
 
-    <!-- Script tìm kiếm nhanh và phóng to ảnh -->
-    <script>
-        function filterCategoryTable() {
-            const query = document.getElementById('liveSearchInput').value.toLowerCase().trim();
-            const rows = document.querySelectorAll('#categoryTableBody tr.category-row');
-            let matchCount = 0;
+    function applyFilter() {
+        const query = (search ? search.value : '').trim().toLocaleLowerCase('vi');
+        let visible = 0;
+        rows.forEach(function (row) {
+            const name = (row.dataset.name || '').toLocaleLowerCase('vi');
+            const matches = (statusFilter === 'all' || row.dataset.status === statusFilter) && name.includes(query);
+            row.style.display = matches ? '' : 'none';
+            if (matches) visible++;
+        });
+        if (noResult) noResult.style.display = rows.length && visible === 0 ? '' : 'none';
+    }
 
-            rows.forEach(row => {
-                const nameText = row.querySelector('.cat-name')?.textContent.toLowerCase() || '';
-                if (nameText.includes(query)) {
-                    row.style.display = '';
-                    matchCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+    if (search) search.addEventListener('input', applyFilter);
+    document.querySelectorAll('[data-filter]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('[data-filter]').forEach(function (item) { item.classList.remove('active'); });
+            button.classList.add('active');
+            statusFilter = button.dataset.filter;
+            applyFilter();
+        });
+    });
 
-            const noMatchDiv = document.getElementById('noSearchMatch');
-            if (matchCount === 0 && rows.length > 0) {
-                noMatchDiv.classList.remove('d-none');
-            } else {
-                noMatchDiv.classList.add('d-none');
-            }
-        }
-
-        function showImageModal(src, title) {
-            document.getElementById('modalImgTag').src = src;
-            document.getElementById('imageModalTitle').textContent = title;
-            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-            modal.show();
-        }
-    </script>
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    function closeModal() { modal.classList.remove('open'); }
+    document.querySelectorAll('.previewable').forEach(function (img) {
+        img.addEventListener('click', function () {
+            modalImage.src = img.src;
+            modalCaption.textContent = img.closest('tr').querySelector('.category-name').textContent;
+            modal.classList.add('open');
+        });
+    });
+    document.getElementById('imageModalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', function (event) { if (event.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeModal(); });
+})();
+</script>
 </body>
 </html>

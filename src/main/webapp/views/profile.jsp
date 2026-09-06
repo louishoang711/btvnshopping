@@ -4,242 +4,120 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hồ Sơ Cá Nhân</title>
-    <style>
-        .avatar-wrapper {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            margin: 0 auto;
-            border-radius: 50%;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: all 0.3s ease;
-        }
-        .avatar-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            font-size: 0.8rem;
-        }
-        .avatar-wrapper:hover .avatar-overlay {
-            opacity: 1;
-        }
-        .avatar-wrapper:hover .avatar-img {
-            transform: scale(1.05);
-        }
-    </style>
+    <title>Hồ sơ cá nhân</title>
 </head>
 <body>
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/categories" class="text-decoration-none">Hệ thống</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Hồ sơ cá nhân</li>
-        </ol>
-    </nav>
-
-    <div class="row justify-content-center">
-        <div class="col-lg-9">
-            <!-- Thông báo thành công / lỗi trực quan -->
-            <c:if test="${not empty message}">
-                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm d-flex align-items-center" role="alert">
-                    <i class="bi bi-check-circle-fill fs-5 me-2 text-success"></i>
-                    <div>${message}</div>
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-                </div>
-            </c:if>
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm d-flex align-items-center" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill fs-5 me-2 text-danger"></i>
-                    <div>${error}</div>
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-                </div>
-            </c:if>
-
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 border-bottom">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="card-title mb-0 fw-bold text-dark">
-                                <i class="bi bi-person-lines-fill me-2 text-primary"></i>Hồ Sơ Của Tôi
-                            </h5>
-                            <small class="text-muted">Quản lý và cập nhật thông tin tài khoản cá nhân của bạn</small>
-                        </div>
-                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">
-                            <i class="bi bi-patch-check-fill me-1"></i>Tài khoản đã kích hoạt
-                        </span>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    <form action="${pageContext.request.contextPath}/profile" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        <input type="hidden" name="id" value="${user.id}" />
-
-                        <div class="row g-4">
-                            <!-- Cột Avatar trực quan -->
-                            <div class="col-md-4 text-center border-end-md pb-3 pb-md-0">
-                                <!-- Khung Avatar tương tác có Overlay -->
-                                <div class="avatar-wrapper shadow-sm border border-2 border-primary-subtle mb-3" onclick="document.getElementById('imageFile').click();" title="Bấm vào đây để chọn ảnh mới từ máy tính">
-                                    <c:choose>
-                                        <c:when test="${user.images.startsWith('http')}">
-                                            <img id="avatarPreview" src="${user.images}" class="avatar-img" alt="Avatar" />
-                                        </c:when>
-                                        <c:otherwise>
-                                            <img id="avatarPreview" src="${pageContext.request.contextPath}/image?fname=${user.images}" 
-                                                 class="avatar-img" alt="Avatar"
-                                                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" />
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <div class="avatar-overlay">
-                                        <i class="bi bi-camera-fill fs-4 mb-1"></i>
-                                        <span>Đổi ảnh</span>
-                                    </div>
-                                </div>
-
-                                <input type="file" id="imageFile" name="imageFile" class="d-none"
-                                       accept="image/*" onchange="previewImage(this);" />
-
-                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 mb-2" onclick="document.getElementById('imageFile').click();">
-                                    <i class="bi bi-upload me-1"></i>Chọn ảnh từ máy
-                                </button>
-                                <div class="text-muted small mb-3">Hỗ trợ JPG, PNG, WEBP (tối đa 10MB)</div>
-
-                                <!-- Thẻ trạng thái tài khoản -->
-                                <div class="p-3 bg-light rounded-3 text-start">
-                                    <div class="small text-muted mb-1">VAI TRÒ HỆ THỐNG</div>
-                                    <div class="fw-bold text-dark d-flex align-items-center gap-1">
-                                        <i class="bi bi-shield-lock-fill text-primary"></i>
-                                        <span>${user.role == 1 ? "Quản trị viên (Admin)" : "Người dùng"}</span>
-                                    </div>
-                                    <hr class="my-2">
-                                    <div class="small text-muted mb-1">TRẠNG THÁI</div>
-                                    <div class="text-success fw-semibold small">
-                                        <i class="bi bi-circle-fill text-success" style="font-size: 8px;"></i> Đang hoạt động bình thường
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Cột Form nhập liệu -->
-                            <div class="col-md-8 ps-md-4">
-                                <div class="row g-3">
-                                    <!-- Tên đăng nhập -->
-                                    <div class="col-md-6">
-                                        <label class="form-label text-muted small fw-semibold">TÊN ĐĂNG NHẬP</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
-                                            <input type="text" class="form-control bg-light" value="${user.username}" readonly />
-                                        </div>
-                                    </div>
-
-                                    <!-- Email -->
-                                    <div class="col-md-6">
-                                        <label class="form-label text-muted small fw-semibold">EMAIL</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
-                                            <input type="email" class="form-control bg-light" value="${user.email}" readonly />
-                                        </div>
-                                    </div>
-
-                                    <!-- Họ và tên (Cho phép sửa) -->
-                                    <div class="col-12">
-                                        <label for="fullname" class="form-label fw-semibold">
-                                            Họ và tên <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group has-validation">
-                                            <span class="input-group-text"><i class="bi bi-card-text"></i></span>
-                                            <input type="text" class="form-control" id="fullname" name="fullname" 
-                                                   value="${user.fullname}" required minlength="2" maxlength="100" 
-                                                   placeholder="Nhập họ và tên đầy đủ..." />
-                                            <div class="invalid-feedback">
-                                                Vui lòng nhập họ và tên (tối thiểu 2 ký tự).
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Số điện thoại (Cho phép sửa) -->
-                                    <div class="col-12">
-                                        <label for="phone" class="form-label fw-semibold">
-                                            Số điện thoại <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group has-validation">
-                                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                                            <input type="tel" class="form-control" id="phone" name="phone" 
-                                                   value="${user.phone}" required 
-                                                   pattern="^(0|\+84)[3|5|7|8|9][0-9]{8}$"
-                                                   placeholder="Ví dụ: 0912345678" />
-                                            <div class="invalid-feedback">
-                                                Vui lòng nhập số điện thoại hợp lệ (10 số, bắt đầu bằng 03, 05, 07, 08, 09).
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Hoặc URL ảnh online -->
-                                    <div class="col-12">
-                                        <label for="images" class="form-label text-muted small fw-semibold">HOẶC LIÊN KẾT ẢNH ONLINE (URL)</label>
-                                        <input type="url" class="form-control form-control-sm" id="images" name="images" 
-                                               value="${user.images.startsWith('http') ? user.images : ''}" 
-                                               placeholder="https://example.com/avatar.jpg"
-                                               oninput="if(this.value.startsWith('http')) document.getElementById('avatarPreview').src = this.value;" />
-                                    </div>
-                                </div>
-
-                                <!-- Nút bấm hành động -->
-                                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
-                                    <a href="${pageContext.request.contextPath}/admin/categories" class="btn btn-light border px-3">
-                                        Quay lại
-                                    </a>
-                                    <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-xs">
-                                        <i class="bi bi-check2-circle me-1"></i>Lưu thay đổi thông tin
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="page-stack">
+    <div class="page-heading">
+        <div>
+            <p class="page-kicker">Tài khoản quản trị</p>
+            <h1 class="page-title">Hồ sơ cá nhân</h1>
+            <p class="page-subtitle">Quản lý thông tin liên hệ và ảnh đại diện của bạn.</p>
         </div>
     </div>
 
-    <!-- Script xem trước ảnh khi chọn file và Form Validation -->
-    <script>
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('avatarPreview').src = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+    <c:if test="${not empty message}"><div class="alert alert-success"><c:out value="${message}"/></div></c:if>
+    <c:if test="${not empty error}"><div class="alert alert-error"><c:out value="${error}"/></div></c:if>
 
-        (() => {
-            'use strict';
-            const forms = document.querySelectorAll('.needs-validation');
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-    </script>
+    <form id="profileForm" action="${pageContext.request.contextPath}/profile" method="post" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="id" value="${user.id}">
+
+        <section class="panel profile-hero">
+            <div class="profile-summary">
+                <div class="avatar-wrap" id="avatarTrigger" title="Chọn ảnh đại diện mới">
+                    <div class="avatar-img avatar-fallback" id="avatarFallback">AD</div>
+                    <c:choose>
+                        <c:when test="${not empty user.images && user.images.startsWith('http')}"><img class="avatar-img" id="avatarPreview" src="${user.images}" alt="Ảnh đại diện"></c:when>
+                        <c:when test="${not empty user.images}"><img class="avatar-img" id="avatarPreview" src="${pageContext.request.contextPath}/image?fname=${user.images}" alt="Ảnh đại diện"></c:when>
+                    </c:choose>
+                    <span class="avatar-edit" aria-hidden="true">
+                        <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 5h2l1-2h4l1 2h2v8H3V5Z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="9" r="2.3" stroke="currentColor" stroke-width="1.4"/></svg>
+                    </span>
+                </div>
+                <div>
+                    <h2 class="profile-name"><c:out value="${user.fullname}"/></h2>
+                    <p class="profile-email"><c:out value="${user.email}"/></p>
+                    <div class="profile-badges"><span class="status status-active">Đang hoạt động</span><span class="status status-warning">${user.role == 1 ? 'Quản trị viên' : 'Người dùng'}</span></div>
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Lưu hồ sơ →</button>
+        </section>
+
+        <div class="profile-columns">
+            <section class="panel">
+                <div class="panel-header"><div><h2 class="panel-title">Thông tin cá nhân</h2><p class="panel-subtitle">Thông tin được sử dụng trong hệ thống quản trị.</p></div></div>
+                <div class="form-section">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="username">Tên đăng nhập</label>
+                            <input class="form-control mono" id="username" type="text" value="<c:out value='${user.username}'/>" readonly>
+                        </div>
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input class="form-control" id="email" type="email" value="<c:out value='${user.email}'/>" readonly>
+                        </div>
+                        <div class="field">
+                            <label for="fullname">Họ và tên *</label>
+                            <input class="form-control" id="fullname" name="fullname" type="text" value="<c:out value='${user.fullname}'/>" minlength="2" maxlength="100" required autocomplete="name">
+                        </div>
+                        <div class="field">
+                            <label for="phone">Số điện thoại *</label>
+                            <input class="form-control mono" id="phone" name="phone" type="tel" value="<c:out value='${user.phone}'/>" pattern="^(0|\+84)[35789][0-9]{8}$" placeholder="0912345678" required autocomplete="tel">
+                        </div>
+                        <div class="field full">
+                            <label for="imageFile">Ảnh đại diện mới <span class="field-hint">JPG, PNG, GIF hoặc WEBP · tối đa 10MB</span></label>
+                            <input class="form-control" id="imageFile" name="imageFile" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
+                        </div>
+                        <div class="field full">
+                            <label for="images">Hoặc liên kết ảnh online</label>
+                            <input class="form-control" id="images" name="images" type="url" value="${not empty user.images && user.images.startsWith('http') ? user.images : ''}" placeholder="https://example.com/avatar.jpg">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer"><span class="field-hint">Cập nhật gần nhất: hôm nay</span><button class="btn btn-primary" type="submit">Lưu thay đổi →</button></div>
+            </section>
+
+            <aside class="panel">
+                <div class="panel-header"><div><h2 class="panel-title">Tài khoản</h2><p class="panel-subtitle">Quyền truy cập hiện tại.</p></div></div>
+                <div class="account-list">
+                    <div class="account-row"><span class="account-label">Mã người dùng</span><span class="account-value mono">USR-${user.id}</span></div>
+                    <div class="account-row"><span class="account-label">Vai trò</span><span class="account-value">${user.role == 1 ? 'Administrator' : 'User'}</span></div>
+                    <div class="account-row"><span class="account-label">Quản lý danh mục</span><span class="status status-active">Được cấp</span></div>
+                    <div class="account-row"><span class="account-label">Quản lý hồ sơ</span><span class="status status-active">Được cấp</span></div>
+                    <div class="account-row"><span class="account-label">Phiên đăng nhập</span><span class="account-value">Thiết bị hiện tại</span></div>
+                </div>
+            </aside>
+        </div>
+    </form>
+</div>
+
+<script>
+(function () {
+    const form = document.getElementById('profileForm');
+    const file = document.getElementById('imageFile');
+    const url = document.getElementById('images');
+    const trigger = document.getElementById('avatarTrigger');
+    const fallback = document.getElementById('avatarFallback');
+    let preview = document.getElementById('avatarPreview');
+
+    function showPreview(src) {
+        if (!preview) {
+            preview = document.createElement('img');
+            preview.id = 'avatarPreview'; preview.className = 'avatar-img'; preview.alt = 'Ảnh đại diện';
+            trigger.insertBefore(preview, trigger.querySelector('.avatar-edit'));
+        }
+        preview.src = src; preview.hidden = false; fallback.hidden = true;
+        preview.onerror = function () { preview.hidden = true; fallback.hidden = false; };
+    }
+
+    if (preview) { fallback.hidden = true; preview.onerror = function () { preview.hidden = true; fallback.hidden = false; }; }
+    trigger.addEventListener('click', function () { file.click(); });
+    file.addEventListener('change', function () { if (file.files && file.files[0]) showPreview(URL.createObjectURL(file.files[0])); });
+    url.addEventListener('input', function () { if (/^https?:\/\//i.test(url.value.trim())) showPreview(url.value.trim()); });
+    form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) { event.preventDefault(); form.querySelector(':invalid').focus(); }
+    });
+})();
+</script>
 </body>
 </html>

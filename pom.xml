@@ -5,7 +5,7 @@
   <artifactId>btvnshopping</artifactId>
   <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>btvnshopping Maven Webapp</name>
+  <name>HCMUTE Shop</name>
   <url>http://maven.apache.org</url>
   
   <properties>
@@ -56,6 +56,13 @@
         <groupId>org.glassfish.web</groupId>
         <artifactId>jakarta.servlet.jsp.jstl</artifactId>
         <version>3.0.1</version>
+    </dependency>
+
+    <!-- Jakarta Mail implementation used for registration/reset OTP emails -->
+    <dependency>
+        <groupId>org.eclipse.angus</groupId>
+        <artifactId>jakarta.mail</artifactId>
+        <version>2.0.3</version>
     </dependency>
   </dependencies>
   

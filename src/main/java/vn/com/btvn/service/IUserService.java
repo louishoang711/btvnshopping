@@ -9,6 +9,11 @@ public interface IUserService {
     void delete(int id) throws Exception;
     User findById(int id);
     User findByUsername(String username);
+    User findByEmail(String email);
+    User authenticate(String usernameOrEmail, String password);
+    User register(User user);
+    void activate(int userId);
+    void changePassword(int userId, String newPassword);
     List<User> findAll();
     User getOrCreateDefaultUser();
 }

@@ -4,153 +4,92 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Thêm Danh Mục Mới</title>
+    <title>Thêm danh mục</title>
 </head>
 <body>
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/categories" class="text-decoration-none">Danh mục</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Thêm mới</li>
-        </ol>
-    </nav>
-
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
-                    <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark">
-                            <i class="bi bi-folder-plus me-2 text-primary"></i>Thêm Mới Danh Mục
-                        </h5>
-                        <small class="text-muted">Nhập thông tin chi tiết và tải hình ảnh đại diện cho danh mục</small>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    <c:if test="${not empty error}">
-                        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
-                            <i class="bi bi-exclamation-circle me-2"></i>${error}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    </c:if>
-
-                    <form action="${pageContext.request.contextPath}/admin/category/insert" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        <!-- Tên danh mục -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label for="categoryname" class="form-label fw-semibold mb-0">Tên danh mục <span class="text-danger">*</span></label>
-                                <span class="text-muted small" id="charCount">0/200 ký tự</span>
-                            </div>
-                            <input type="text" class="form-control" id="categoryname" name="categoryname" 
-                                   placeholder="Ví dụ: Thiết bị di động, Thời trang nam, Đồ gia dụng..."
-                                   required minlength="3" maxlength="200" value="${categoryname}" 
-                                   oninput="updateCharCount(this);" />
-                            <div class="invalid-feedback">
-                                Vui lòng nhập tên danh mục hợp lệ (từ 3 đến 200 ký tự).
-                            </div>
-                        </div>
-
-                        <!-- Khu vực hình ảnh trực quan (Interactive Upload & Preview) -->
-                        <div class="mb-4 p-3 bg-light rounded-3 border">
-                            <label class="form-label fw-semibold d-block">Hình ảnh danh mục</label>
-                            
-                            <div class="row align-items-center g-3">
-                                <!-- Hộp xem trước trực quan -->
-                                <div class="col-sm-4 text-center">
-                                    <div class="position-relative border rounded-3 bg-white p-2 d-inline-block shadow-2xs">
-                                        <img id="categoryImgPreview" src="https://via.placeholder.com/150x110?text=Xem+tr%C6%B0%E1%BB%9Bc+%E1%BA%A3nh" 
-                                             class="rounded img-fluid" style="width: 140px; height: 100px; object-fit: cover;" alt="Xem trước" />
-                                    </div>
-                                    <div class="small text-muted mt-1">Ảnh xem trước</div>
-                                </div>
-
-                                <!-- Các lựa chọn tải ảnh -->
-                                <div class="col-sm-8">
-                                    <div class="mb-2">
-                                        <label for="images1" class="form-label small fw-semibold text-muted mb-1">TẢI FILE TỪ MÁY TÍNH</label>
-                                        <input class="form-control" type="file" id="images1" name="images1" accept="image/*" onchange="previewUploadFile(this);" />
-                                    </div>
-                                    <div>
-                                        <label for="images" class="form-label small fw-semibold text-muted mb-1">HOẶC DÁN LINK ẢNH ONLINE</label>
-                                        <input type="url" class="form-control" id="images" name="images" 
-                                               placeholder="https://..." oninput="previewUrlImage(this.value);" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Trạng thái (Thẻ chọn trực quan) -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold d-block">Trạng thái danh mục</label>
-                            <div class="row g-2">
-                                <div class="col-sm-6">
-                                    <input type="radio" class="btn-check" name="status" id="statusActive" value="1" checked>
-                                    <label class="btn btn-outline-success w-100 py-2 d-flex align-items-center justify-content-center gap-2" for="statusActive">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                        <span>Đang hoạt động</span>
-                                    </label>
-                                </div>
-                                <div class="col-sm-6">
-                                    <input type="radio" class="btn-check" name="status" id="statusLocked" value="0">
-                                    <label class="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2" for="statusLocked">
-                                        <i class="bi bi-lock-fill"></i>
-                                        <span>Tạm khóa</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Nút bấm -->
-                        <div class="d-flex justify-content-between pt-3 border-top">
-                            <a href="${pageContext.request.contextPath}/admin/categories" class="btn btn-light border px-3">
-                                <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
-                            </a>
-                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
-                                <i class="bi bi-check2-circle me-1"></i>Lưu danh mục
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="page-stack">
+    <div class="page-heading">
+        <div>
+            <p class="page-kicker">Quản lý danh mục</p>
+            <h1 class="page-title">Tạo danh mục mới</h1>
+            <p class="page-subtitle">Thêm một nhóm sản phẩm mới vào hệ thống cửa hàng.</p>
         </div>
     </div>
 
-    <!-- Script đếm ký tự & xem trước ảnh trực quan -->
-    <script>
-        function updateCharCount(input) {
-            document.getElementById('charCount').textContent = input.value.length + '/200 ký tự';
-        }
+    <c:if test="${not empty error}"><div class="alert alert-error"><c:out value="${error}"/></div></c:if>
 
-        function previewUploadFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('categoryImgPreview').src = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+    <form id="categoryForm" action="${pageContext.request.contextPath}/admin/category/insert" method="post" enctype="multipart/form-data" novalidate>
+        <div class="form-layout">
+            <section class="panel">
+                <div class="panel-header"><div><h2 class="panel-title">Thông tin danh mục</h2><p class="panel-subtitle">Các trường có dấu * là bắt buộc.</p></div><span class="status status-warning">Bản nháp mới</span></div>
+                <div class="form-section">
+                    <div class="form-grid">
+                        <div class="field full">
+                            <label for="categoryname">Tên danh mục * <span class="field-hint" id="charCount">0/200 ký tự</span></label>
+                            <input class="form-control" id="categoryname" name="categoryname" type="text" value="<c:out value='${categoryname}'/>" minlength="3" maxlength="200" placeholder="Ví dụ: Thiết bị điện tử" required autocomplete="off">
+                            <span class="field-hint">Tên rõ ràng giúp khách hàng tìm sản phẩm nhanh hơn.</span>
+                        </div>
+                        <div class="field full">
+                            <label>Trạng thái *</label>
+                            <div class="choice-grid">
+                                <div><input class="choice-input" type="radio" name="status" id="statusActive" value="1" checked><label class="choice-card" for="statusActive"><span class="choice-radio"></span><span><span class="choice-title">Đang hoạt động</span><span class="choice-help">Hiển thị danh mục trong hệ thống</span></span></label></div>
+                                <div><input class="choice-input" type="radio" name="status" id="statusPaused" value="0"><label class="choice-card" for="statusPaused"><span class="choice-radio"></span><span><span class="choice-title">Tạm khóa</span><span class="choice-help">Ẩn danh mục để hoàn thiện sau</span></span></label></div>
+                            </div>
+                        </div>
+                        <div class="field full">
+                            <label for="images1">Tải ảnh từ máy <span class="field-hint">JPG, PNG hoặc WEBP</span></label>
+                            <input class="form-control" id="images1" name="images1" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+                        </div>
+                        <div class="field full">
+                            <label for="images">Hoặc liên kết ảnh</label>
+                            <input class="form-control" id="images" name="images" type="url" placeholder="https://example.com/image.jpg">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <a class="btn" href="${pageContext.request.contextPath}/admin/categories">← Quay lại</a>
+                    <button class="btn btn-primary" type="submit">Tạo danh mục →</button>
+                </div>
+            </section>
 
-        function previewUrlImage(url) {
-            if (url && url.trim().startsWith('http')) {
-                document.getElementById('categoryImgPreview').src = url.trim();
-            }
-        }
+            <aside class="panel preview-card">
+                <h2 class="panel-title">Xem trước</h2><p class="panel-subtitle" style="margin-bottom:14px">Ảnh sẽ hiển thị theo tỷ lệ 4:3.</p>
+                <div class="preview-frame">
+                    <div class="preview-empty" id="previewEmpty">
+                        <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" stroke="currentColor"/><circle cx="12" cy="13" r="2.5" stroke="currentColor"/><path d="m7 23 6-6 4 4 3-3 5 5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Chọn tệp hoặc dán URL<br>để xem trước hình ảnh
+                    </div>
+                    <img id="categoryImgPreview" alt="Ảnh xem trước" hidden>
+                </div>
+                <p class="preview-note">Khuyến nghị ảnh tối thiểu 800×600px, dung lượng dưới 5MB để tải trang nhanh.</p>
+            </aside>
+        </div>
+    </form>
+</div>
 
-        // Bootstrap form validation
-        (() => {
-            'use strict';
-            const forms = document.querySelectorAll('.needs-validation');
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-    </script>
+<script>
+(function () {
+    const form = document.getElementById('categoryForm');
+    const nameInput = document.getElementById('categoryname');
+    const count = document.getElementById('charCount');
+    const fileInput = document.getElementById('images1');
+    const urlInput = document.getElementById('images');
+    const preview = document.getElementById('categoryImgPreview');
+    const empty = document.getElementById('previewEmpty');
+
+    function updateCount() { count.textContent = nameInput.value.length + '/200 ký tự'; }
+    function showPreview(src) { preview.src = src; preview.hidden = false; empty.hidden = true; }
+    updateCount();
+    nameInput.addEventListener('input', updateCount);
+    fileInput.addEventListener('change', function () {
+        if (fileInput.files && fileInput.files[0]) showPreview(URL.createObjectURL(fileInput.files[0]));
+    });
+    urlInput.addEventListener('input', function () { if (/^https?:\/\//i.test(urlInput.value.trim())) showPreview(urlInput.value.trim()); });
+    preview.addEventListener('error', function () { preview.hidden = true; empty.hidden = false; });
+    form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) { event.preventDefault(); nameInput.focus(); }
+    });
+})();
+</script>
 </body>
 </html>
