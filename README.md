@@ -26,11 +26,20 @@ HCMUTE Shop là project bài tập Jakarta Servlet chạy trên Tomcat 10.1, s�
 4. Maven Update Project để tải dependencies, sau đó Run on Server.
 5. Mở `http://localhost:8080/btvnshopping/`.
 
-Tài khoản quản trị mặc định được tạo khi mở trang đăng nhập lần đầu:
+Cấu hình kết nối SQL Server bằng biến môi trường trước khi chạy:
+
+```powershell
+$env:DB_URL="jdbc:sqlserver://localhost:1433;databaseName=jakartaJPA;encrypt=true;trustServerCertificate=true"
+$env:DB_USERNAME="sa"
+$env:DB_PASSWORD="your-local-sqlserver-password"
+$env:ADMIN_DEFAULT_PASSWORD="choose-a-local-admin-password"
+```
+
+Tài khoản quản trị mặc định được tạo khi mở trang đăng nhập lần đầu nếu đã cấu hình `ADMIN_DEFAULT_PASSWORD`:
 
 ```text
 username: admin
-password: 123456
+password: giá trị của ADMIN_DEFAULT_PASSWORD
 ```
 
 ## Cấu hình gửi OTP email

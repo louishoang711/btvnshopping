@@ -103,10 +103,14 @@ public class UserServiceImpl implements IUserService {
     public synchronized User getOrCreateDefaultUser() {
         User existingAdmin = userDao.findByUsername("admin");
         if (existingAdmin != null) return existingAdmin;
-        // Tạo user mặc định nếu chưa có
+        String defaultPassword = System.getenv("ADMIN_DEFAULT_PASSWORD");
+        if (defaultPassword == null || defaultPassword.isBlank()) {
+            return null;
+        }
+        // Chỉ tạo tài khoản quản trị khi mật khẩu bootstrap được cấu hình ngoài source.
         User defaultUser = new User();
         defaultUser.setUsername("admin");
-        defaultUser.setPassword("123456");
+        defaultUser.setPassword(defaultPassword);
         defaultUser.setFullname("Nguyễn Văn A");
         defaultUser.setPhone("0912345678");
         defaultUser.setEmail("admin@hcmute-shop.local");

@@ -20,7 +20,7 @@ public class Test {
             IProductService productService = new ProductServiceImpl();
             User admin = userService.getOrCreateDefaultUser();
             System.out.println("Kết nối CSDL và tạo bảng thành công!");
-            System.out.println("Admin: " + admin.getUsername());
+            System.out.println("Admin: " + (admin == null ? "chưa cấu hình ADMIN_DEFAULT_PASSWORD" : admin.getUsername()));
             System.out.println("Số sản phẩm hiện tại: " + productService.count("", null, false));
         } catch (Exception e) {
             e.printStackTrace();
